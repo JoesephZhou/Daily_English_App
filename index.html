@@ -323,6 +323,22 @@ nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex
 
 /* SESSION HISTORY */
 .hist-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:8px;box-shadow:var(--sh-sm);}
+
+/* CORRECTIONS */
+.corr-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:8px;box-shadow:var(--sh-sm);}
+.corr-date{font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);margin-bottom:8px;}
+.corr-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.corr-original{flex:1;padding:8px 12px;background:var(--maple-light);border:1px solid var(--maple-mid);border-radius:var(--r-sm);font-size:12.5px;color:var(--maple);}
+.corr-arrow{font-size:16px;color:var(--text3);padding-top:6px;flex-shrink:0;}
+.corr-natural{flex:1;padding:8px 12px;background:var(--green-light);border:1px solid #B3DFC5;border-radius:var(--r-sm);font-size:12.5px;color:var(--green);font-weight:500;}
+.corr-context{font-size:11px;color:var(--text2);margin-bottom:4px;font-style:italic;}
+.corr-example{font-size:12px;color:var(--text2);line-height:1.5;padding:6px 10px;background:var(--surface2);border-radius:var(--r-sm);border-left:3px solid var(--green);}
+.corr-del{background:none;border:none;color:var(--border2);cursor:pointer;font-size:11px;padding:2px 4px;transition:color .18s;float:right;}
+.corr-del:hover{color:var(--maple);}
+.corr-filters{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.corr-filter{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:11.5px;font-weight:500;cursor:pointer;transition:all .18s;font-family:'Inter',sans-serif;box-shadow:var(--sh-sm);}
+.corr-filter.active,.corr-filter:hover{background:var(--text);color:white;border-color:var(--text);}
+.corr-count{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-left:auto;align-self:center;}
 .hist-date{font-size:10.5px;font-family:'DM Mono',monospace;color:var(--text3);margin-bottom:5px;}
 .hist-note{font-size:13.5px;color:var(--text);line-height:1.5;margin-bottom:8px;}
 .hist-words{display:flex;flex-wrap:wrap;gap:5px;}
@@ -432,6 +448,7 @@ nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex
   <button class="tab" onclick="switchTab('flashcards',this)">Flashcards</button>
   <button class="tab" onclick="switchTab('wordlist',this)">All Words</button>
   <button class="tab" onclick="switchTab('history',this)">History</button>
+  <button class="tab" onclick="switchTab('corrections',this)">✏️ Corrections</button>
 </nav>
 
 <div class="app-body">
@@ -786,6 +803,7 @@ function switchTab(name,btn){
   if(name==='flashcards')renderFC();
   if(name==='wordlist')renderWordList();
   if(name==='history')renderHistory();
+  if(name==='corrections')renderCorrections();
 }
 
 function updateHeader(){
@@ -1329,18 +1347,22 @@ function showTyping(){
 }
 function removeTyping(){const el=document.getElementById('typingMsg');if(el)el.remove();}
 function normalizeQuotes(s){return s.replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g,'"').replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g,"'").replace(/[\u2014\u2013]/g,'-').replace(/\u2026/g,'...');}
-function isWrapUp(t){return /WRAP\s*UP/i.test(t)&&/ADD_WORD:/i.test(t);}
+function isWrapUp(t){return /WRAP\s*UP/i.test(t)&&(/ADD_WORD:/i.test(t)||/ADD_CORRECTION:/i.test(t));}
 
 function handleWrapUp(text){
   const results=[];
+
+  // ── Check in ──
   if(/CHECK\s*IN/i.test(text)){
     const t=todayStr();
     if(!db.checkins.includes(t)){db.checkins.push(t);save();results.push(`✅ Checked in! Streak: <strong>${calcStreak()} days</strong>`);updateHeader();renderCalendar();}
     else results.push('✅ Already checked in today!');
   }
-  const chunks=text.split(/ADD_WORD:\s*/);chunks.shift();
+
+  // ── Parse ADD_WORD ──
+  const wordChunks=text.split(/ADD_WORD:\s*/);wordChunks.shift();
   let added=0,skipped=0,skList=[],errors=0,newPhrases=[];
-  for(const chunk of chunks){
+  for(const chunk of wordChunks){
     const jm=chunk.match(/^(\{[^]*?\})/);if(!jm){errors++;continue;}
     try{
       const w=JSON.parse(normalizeQuotes(jm[1]));
@@ -1354,7 +1376,29 @@ function handleWrapUp(text){
     }catch{errors++;}
   }
   if(added>0){save();updateHeader();}
-  // Save session
+
+  // ── Parse ADD_CORRECTION ──
+  if(!db.corrections)db.corrections=[];
+  const corrChunks=text.split(/ADD_CORRECTION:\s*/);corrChunks.shift();
+  let corrAdded=0,corrErrors=0;
+  for(const chunk of corrChunks){
+    const jm=chunk.match(/^(\{[^]*?\})/);if(!jm)continue;
+    try{
+      const raw=normalizeQuotes(jm[1]);
+      const co=JSON.parse(raw);
+      if(co.natural&&co.natural.toLowerCase()!=='none'&&co.original){
+        // Deduplicate by natural phrase
+        const exists=db.corrections.some(x=>x.natural.toLowerCase()===co.natural.toLowerCase());
+        if(!exists){
+          db.corrections.push({id:Date.now()+Math.random()+corrAdded,original:co.original,natural:co.natural,context:co.context||'',example:co.example||'',date:todayStr()});
+          corrAdded++;
+        }
+      }
+    }catch{corrErrors++;}
+  }
+  if(corrAdded>0){save();}
+
+  // ── Save session ──
   const noteMatch=text.match(/SESSION\s*NOTE\s*\n?(.+)/i);
   const note=noteMatch?noteMatch[1].trim():'';
   const today=todayStr();
@@ -1366,10 +1410,13 @@ function handleWrapUp(text){
     db.sessions.push({date:today,note,words:newPhrases,reviewed:0});
   }
   save();renderHeatmap();renderTodayWords();
+
+  // ── Results summary ──
   if(added>0)results.push(`🍁 Added <strong>${added}</strong> word${added>1?'s':''}! Total: <strong>${db.words.length}</strong>`);
   if(skipped>0)results.push(`⏭ Skipped <strong>${skipped}</strong> already in deck: <em>${skList.join(', ')}</em>`);
-  if(errors>0)results.push(`⚠️ ${errors} entry failed to parse`);
-  if(added===0&&skipped===0&&errors===0)results.push('⚠️ Nothing found — check format');
+  if(corrAdded>0)results.push(`✏️ Saved <strong>${corrAdded}</strong> correction${corrAdded>1?'s':''}! View in <strong>Corrections</strong> tab`);
+  if(errors>0||corrErrors>0)results.push(`⚠️ ${errors+corrErrors} entr${(errors+corrErrors)>1?'ies':'y'} failed to parse`);
+  if(added===0&&skipped===0&&corrAdded===0)results.push('⚠️ Nothing found — check format');
   if(note)results.push(`💬 <em>${note}</em>`);
   addMsg('ai',`📦 <strong>Wrap Up Processed</strong><br><br>${results.join('<br>')}`);
 }
@@ -1423,10 +1470,65 @@ RULES: Be casual, warm, brief. ASCII quotes only in ADD_WORD.`;
 }
 
 // ═══════════════════════════════════════
+//  CORRECTIONS
+// ═══════════════════════════════════════
+let corrFilter='all';
+
+function renderCorrections(){
+  if(!db.corrections)db.corrections=[];
+  const el=document.getElementById('correctionsEl');
+  if(!el)return;
+
+  // filter by date
+  let list=[...db.corrections];
+  if(corrFilter==='today')list=list.filter(c=>c.date===todayStr());
+  else if(corrFilter==='week'){const d=new Date();d.setDate(d.getDate()-6);const since=d.toISOString().slice(0,10);list=list.filter(c=>c.date>=since);}
+  list.reverse();
+
+  const filterHTML=`<div class="corr-filters">
+    <button class="corr-filter ${corrFilter==='all'?'active':''}" onclick="setCorrFilter('all',this)">All (${db.corrections.length})</button>
+    <button class="corr-filter ${corrFilter==='today'?'active':''}" onclick="setCorrFilter('today',this)">Today</button>
+    <button class="corr-filter ${corrFilter==='week'?'active':''}" onclick="setCorrFilter('week',this)">This week</button>
+    <span class="corr-count">${list.length} correction${list.length!==1?'s':''}</span>
+  </div>`;
+
+  if(!list.length){
+    el.innerHTML=filterHTML+`<div class="empty"><div class="empty-icon">✏️</div><p>No corrections yet.<br>They appear here automatically after each wrap up.</p></div>`;
+    return;
+  }
+
+  el.innerHTML=filterHTML+list.map(co=>`
+    <div class="corr-item">
+      <button class="corr-del" onclick="deleteCorr(${co.id})" title="Delete">✕</button>
+      <div class="corr-date">${co.date}</div>
+      <div class="corr-row">
+        <div class="corr-original">❌ "${co.original}"</div>
+        <div class="corr-arrow">→</div>
+        <div class="corr-natural">✓ "${co.natural}"</div>
+      </div>
+      ${co.context?`<div class="corr-context">${co.context}</div>`:''}
+      ${co.example?`<div class="corr-example">"${co.example}"</div>`:''}
+    </div>`).join('');
+}
+
+function setCorrFilter(f,btn){
+  corrFilter=f;
+  document.querySelectorAll('.corr-filter').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCorrections();
+}
+
+function deleteCorr(id){
+  db.corrections=db.corrections.filter(c=>c.id!==id);
+  save();renderCorrections();toast('🗑 Deleted');
+}
+
+// ═══════════════════════════════════════
 //  BACKUP
 // ═══════════════════════════════════════
 function exportData(){
-  const blob=new Blob([JSON.stringify({version:4,exported:new Date().toISOString(),...db},null,2)],{type:'application/json'});
+  if(!db.corrections)db.corrections=[];
+  const blob=new Blob([JSON.stringify({version:5,exported:new Date().toISOString(),...db},null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`ehspeak_backup_${todayStr()}.json`;a.click();
   toast('✅ Backup exported!');
 }
