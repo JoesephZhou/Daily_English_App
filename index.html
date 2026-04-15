@@ -1560,10 +1560,10 @@ function importData(event){
     try{
       const p=JSON.parse(e.target.result);
       if(!p.words||!p.checkins){toast('❌ Invalid backup');return;}
-      // Always ensure corrections array exists
       if(!db.corrections)db.corrections=[];
+
       if(p.words.length<=db.words.length){
-        // Merge: keep local, add missing from backup
+        // Merge: backup smaller, keep local and add missing
         const ex=new Set(db.words.map(w=>w.phrase.toLowerCase()));
         for(const w of p.words){if(!ex.has(w.phrase.toLowerCase()))db.words.push(w);}
         db.checkins=[...new Set([...db.checkins,...p.checkins])].sort();
@@ -1571,13 +1571,8 @@ function importData(event){
         db.srs={...p.srs,...db.srs};
         if(p.sessions)db.sessions=[...db.sessions,...p.sessions.filter(s=>!db.sessions.find(x=>x.date===s.date))];
         if(p.weakHits)db.weakHits={...p.weakHits,...db.weakHits};
-        if(p.corrections&&p.corrections.length){
-          const existNaturals=new Set(db.corrections.map(c=>(c.natural||'').toLowerCase()));
-          const newCorrs=p.corrections.filter(c=>c.natural&&!existNaturals.has(c.natural.toLowerCase()));
-          db.corrections=[...db.corrections,...newCorrs];
-        }
       } else {
-        // Backup is bigger: use backup as base, keep local extras
+        // Overwrite: backup bigger, use backup as base
         const imp=new Set(p.words.map(w=>w.phrase.toLowerCase()));
         const localExtra=db.words.filter(w=>!imp.has(w.phrase.toLowerCase()));
         db.words=[...p.words,...localExtra];
@@ -1587,19 +1582,19 @@ function importData(event){
         if(p.sessions)db.sessions=p.sessions;
         if(p.weakHits)db.weakHits={...db.weakHits,...p.weakHits};
         if(p.goals)db.goals=p.goals;
-        if(p.corrections&&p.corrections.length){
-          // Merge: backup corrections + any local ones not in backup
-          const backupNaturals=new Set(p.corrections.map(c=>(c.natural||'').toLowerCase()));
-          const localExtra=db.corrections.filter(c=>c.natural&&!backupNaturals.has(c.natural.toLowerCase()));
-          db.corrections=[...p.corrections,...localExtra];
-        }
       }
+
+      // ── Always merge corrections regardless of which branch ──
+      if(p.corrections&&p.corrections.length){
+        const existNaturals=new Set(db.corrections.map(c=>(c.natural||'').toLowerCase().trim()));
+        const incoming=p.corrections.filter(c=>c.natural&&!existNaturals.has(c.natural.toLowerCase().trim()));
+        db.corrections=[...db.corrections,...incoming];
+      }
+
       save();
       updateHeader();renderCalendar();renderHeatmap();
-      // Re-render corrections tab if it's active
-      const corrTab=document.getElementById('section-corrections');
-      if(corrTab&&corrTab.classList.contains('active'))renderCorrections();
-      const corrCount=(db.corrections||[]).length;
+      if(document.getElementById('section-corrections')?.classList.contains('active'))renderCorrections();
+      const corrCount=db.corrections.length;
       toast(`✅ Imported! ${db.words.length} words${corrCount?', '+corrCount+' corrections':''}`);
     }catch(err){toast('❌ Failed to read backup');console.error(err);}
     event.target.value='';
