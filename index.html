@@ -1355,7 +1355,8 @@ function removeTyping(){const el=document.getElementById('typingMsg');if(el)el.r
 function normalizeQuotes(s){return s.replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g,'"').replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g,"'").replace(/[\u2014\u2013]/g,'-').replace(/\u2026/g,'...');}
 function isWrapUp(t){return /WRAP\s*UP/i.test(t)&&(/ADD_WORD:/i.test(t)||/ADD_CORRECTION:/i.test(t));}
 
-function handleWrapUp(text){
+function handleWrapUp(text, mobile=false){
+  const addResult = (html) => mobile ? addMobileMsg('ai', html) : addMsg('ai', html);
   const results=[];
 
   // ── Check in ──
@@ -1424,7 +1425,7 @@ function handleWrapUp(text){
   if(errors>0||corrErrors>0)results.push(`⚠️ ${errors+corrErrors} entr${(errors+corrErrors)>1?'ies':'y'} failed to parse`);
   if(added===0&&skipped===0&&corrAdded===0)results.push('⚠️ Nothing found — check format');
   if(note)results.push(`💬 <em>${note}</em>`);
-  addMsg('ai',`📦 <strong>Wrap Up Processed</strong><br><br>${results.join('<br>')}`);
+  addResult(`📦 <strong>Wrap Up Processed</strong><br><br>${results.join('<br>')}`);
 }
 
 async function sendMsg(mobile=false){
@@ -1436,7 +1437,7 @@ async function sendMsg(mobile=false){
   document.getElementById(sendBtnId).disabled=true;
   if(mobile){addMobileMsg('user',text);showMobileTyping();}
   else{addMsg('user',text);showTyping();}
-  if(isWrapUp(text)){handleWrapUp(text);document.getElementById('sendBtn').disabled=false;return;}
+  if(isWrapUp(text)){handleWrapUp(text,mobile);document.getElementById(sendBtnId).disabled=false;return;}
   convHistory.push({role:'user',content:text});
   showTyping();
   const sys=`You are the AI for "Eh Speak" — a Canadian English learning tracker.
