@@ -536,7 +536,7 @@ nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex
               <button class="bk-btn bk-anki" onclick="exportAnki()">🃏 Anki CSV</button>
               <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
             </div>
-            <div class="bk-note">Anki CSV: File → Import in Anki, comma separator.</div>
+            <div class="bk-note">Backup includes all words, corrections & history. Anki CSV: File → Import in Anki.</div>
           </div>
         </div>
       </div>
@@ -1533,9 +1533,10 @@ function deleteCorr(id){
 // ═══════════════════════════════════════
 function exportData(){
   if(!db.corrections)db.corrections=[];
-  const blob=new Blob([JSON.stringify({version:5,exported:new Date().toISOString(),...db},null,2)],{type:'application/json'});
+  const backup={version:5,exported:new Date().toISOString(),checkins:db.checkins,words:db.words,ratings:db.ratings,srs:db.srs,sessions:db.sessions,goals:db.goals,weakHits:db.weakHits,corrections:db.corrections};
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`ehspeak_backup_${todayStr()}.json`;a.click();
-  toast('✅ Backup exported!');
+  toast(`✅ Backup exported! (${db.words.length} words, ${db.corrections.length} corrections)`);
 }
 function exportAnki(){
   if(!db.words.length){toast('No words to export');return;}
@@ -1549,6 +1550,7 @@ function exportAnki(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`ehspeak_anki_${todayStr()}.csv`;a.click();
   toast(`✅ Anki CSV exported! (${db.words.length} cards)`);
 }
+
 function importData(event){
   const file=event.target.files[0];if(!file)return;
   const reader=new FileReader();
@@ -1563,6 +1565,7 @@ function importData(event){
         db.ratings={...p.ratings,...db.ratings};db.srs={...p.srs,...db.srs};
         if(p.sessions)db.sessions=[...db.sessions,...p.sessions.filter(s=>!db.sessions.find(x=>x.date===s.date))];
         if(p.weakHits)db.weakHits={...p.weakHits,...db.weakHits};
+        if(p.corrections){if(!db.corrections)db.corrections=[];const existIds=new Set(db.corrections.map(c=>c.natural?.toLowerCase()));db.corrections=[...db.corrections,...p.corrections.filter(c=>!existIds.has(c.natural?.toLowerCase()))];}
       } else {
         const imp=new Set(p.words.map(w=>w.phrase.toLowerCase()));
         const local=db.words.filter(w=>!imp.has(w.phrase.toLowerCase()));
@@ -1572,9 +1575,10 @@ function importData(event){
         if(p.sessions)db.sessions=p.sessions;
         if(p.weakHits)db.weakHits={...db.weakHits,...p.weakHits};
         if(p.goals)db.goals=p.goals;
+        if(p.corrections)db.corrections=p.corrections;
       }
       save();updateHeader();renderCalendar();renderHeatmap();
-      toast(`✅ Imported! ${db.words.length} words total`);
+      const corrCount=(db.corrections||[]).length;toast(`✅ Imported! ${db.words.length} words${corrCount?', '+corrCount+' corrections':''}`);
     }catch{toast('❌ Failed to read backup');}
     event.target.value='';
   };
