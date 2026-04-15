@@ -731,14 +731,15 @@ const KEY='ehspeak_v2';
 function load(){
   try{
     const d=JSON.parse(localStorage.getItem(KEY));
-    if(!d)return{checkins:[],words:[],ratings:{},srs:{},sessions:[],goals:{newWords:5,review:10},weakHits:{}};
+    if(!d)return{checkins:[],words:[],ratings:{},srs:{},sessions:[],goals:{newWords:5,review:10},weakHits:{},corrections:[]};
     if(!d.srs)d.srs={};
     if(!d.sessions)d.sessions=[];
     if(!d.goals)d.goals={newWords:5,review:10};
     if(!d.weakHits)d.weakHits={};
+    if(!d.corrections)d.corrections=[];
     return d;
-  }catch{return{checkins:[],words:[],ratings:{},srs:{},sessions:[],goals:{newWords:5,review:10},weakHits:{}};}
-}
+  }catch{return{checkins:[],words:[],ratings:{},srs:{},sessions:[],goals:{newWords:5,review:10},weakHits:{},corrections:[]};}}
+
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db));}catch{}}
 let db=load();
 function todayStr(){return new Date().toISOString().slice(0,10);}
@@ -1558,28 +1559,48 @@ function importData(event){
     try{
       const p=JSON.parse(e.target.result);
       if(!p.words||!p.checkins){toast('❌ Invalid backup');return;}
+      // Always ensure corrections array exists
+      if(!db.corrections)db.corrections=[];
       if(p.words.length<=db.words.length){
+        // Merge: keep local, add missing from backup
         const ex=new Set(db.words.map(w=>w.phrase.toLowerCase()));
         for(const w of p.words){if(!ex.has(w.phrase.toLowerCase()))db.words.push(w);}
         db.checkins=[...new Set([...db.checkins,...p.checkins])].sort();
-        db.ratings={...p.ratings,...db.ratings};db.srs={...p.srs,...db.srs};
+        db.ratings={...p.ratings,...db.ratings};
+        db.srs={...p.srs,...db.srs};
         if(p.sessions)db.sessions=[...db.sessions,...p.sessions.filter(s=>!db.sessions.find(x=>x.date===s.date))];
         if(p.weakHits)db.weakHits={...p.weakHits,...db.weakHits};
-        if(p.corrections){if(!db.corrections)db.corrections=[];const existIds=new Set(db.corrections.map(c=>c.natural?.toLowerCase()));db.corrections=[...db.corrections,...p.corrections.filter(c=>!existIds.has(c.natural?.toLowerCase()))];}
+        if(p.corrections&&p.corrections.length){
+          const existNaturals=new Set(db.corrections.map(c=>(c.natural||'').toLowerCase()));
+          const newCorrs=p.corrections.filter(c=>c.natural&&!existNaturals.has(c.natural.toLowerCase()));
+          db.corrections=[...db.corrections,...newCorrs];
+        }
       } else {
+        // Backup is bigger: use backup as base, keep local extras
         const imp=new Set(p.words.map(w=>w.phrase.toLowerCase()));
-        const local=db.words.filter(w=>!imp.has(w.phrase.toLowerCase()));
-        db.words=[...p.words,...local];
+        const localExtra=db.words.filter(w=>!imp.has(w.phrase.toLowerCase()));
+        db.words=[...p.words,...localExtra];
         db.checkins=[...new Set([...db.checkins,...p.checkins])].sort();
-        db.ratings={...db.ratings,...p.ratings};db.srs={...db.srs,...p.srs};
+        db.ratings={...db.ratings,...p.ratings};
+        db.srs={...db.srs,...p.srs};
         if(p.sessions)db.sessions=p.sessions;
         if(p.weakHits)db.weakHits={...db.weakHits,...p.weakHits};
         if(p.goals)db.goals=p.goals;
-        if(p.corrections)db.corrections=p.corrections;
+        if(p.corrections&&p.corrections.length){
+          // Merge: backup corrections + any local ones not in backup
+          const backupNaturals=new Set(p.corrections.map(c=>(c.natural||'').toLowerCase()));
+          const localExtra=db.corrections.filter(c=>c.natural&&!backupNaturals.has(c.natural.toLowerCase()));
+          db.corrections=[...p.corrections,...localExtra];
+        }
       }
-      save();updateHeader();renderCalendar();renderHeatmap();
-      const corrCount=(db.corrections||[]).length;toast(`✅ Imported! ${db.words.length} words${corrCount?', '+corrCount+' corrections':''}`);
-    }catch{toast('❌ Failed to read backup');}
+      save();
+      updateHeader();renderCalendar();renderHeatmap();
+      // Re-render corrections tab if it's active
+      const corrTab=document.getElementById('section-corrections');
+      if(corrTab&&corrTab.classList.contains('active'))renderCorrections();
+      const corrCount=(db.corrections||[]).length;
+      toast(`✅ Imported! ${db.words.length} words${corrCount?', '+corrCount+' corrections':''}`);
+    }catch(err){toast('❌ Failed to read backup');console.error(err);}
     event.target.value='';
   };
   reader.readAsText(file);
