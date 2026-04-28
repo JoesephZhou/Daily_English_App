@@ -364,6 +364,52 @@ nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex
 .key-ok{background:var(--green-light);border-bottom-color:#B3DFC5;color:var(--green);}
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 
+/* TOPIC MODULE */
+.topic-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;box-shadow:var(--sh-sm);}
+.topic-active-banner{background:linear-gradient(135deg,#1A1814 0%,#2d2820 100%);border-radius:var(--r);padding:18px 20px;margin-bottom:12px;color:white;position:relative;overflow:hidden;}
+.topic-active-banner::before{content:'';position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:var(--maple);opacity:.15;border-radius:50%;}
+.tab-label{font-size:9px;text-transform:uppercase;letter-spacing:2px;opacity:.5;margin-bottom:6px;font-weight:600;}
+.topic-name-display{font-size:20px;font-weight:800;letter-spacing:-.5px;margin-bottom:10px;line-height:1.2;}
+.topic-day-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.topic-day-dots{display:flex;gap:5px;}
+.topic-day-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2);}
+.topic-day-dot.done{background:var(--maple);}
+.topic-day-dot.today{background:white;box-shadow:0 0 0 2px var(--maple);}
+.topic-day-txt{font-size:12px;opacity:.7;}
+.topic-copy-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:white;padding:7px 14px;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:"Inter",sans-serif;transition:all .18s;width:100%;}
+.topic-copy-btn:hover{background:rgba(255,255,255,.22);}
+.topic-copy-btn.copied{background:var(--green);border-color:var(--green);}
+.quiz-banner{background:var(--maple-light);border:1px solid var(--maple-mid);border-radius:var(--r);padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;}
+.quiz-banner-icon{font-size:24px;flex-shrink:0;}
+.quiz-banner-text{flex:1;}
+.quiz-banner-title{font-size:13px;font-weight:700;color:var(--maple);margin-bottom:2px;}
+.quiz-banner-sub{font-size:11px;color:var(--text2);}
+.quiz-copy-btn{padding:6px 14px;background:var(--maple);color:white;border:none;border-radius:var(--r-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:"Inter",sans-serif;white-space:nowrap;}
+.topic-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.topic-hdr-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);}
+.topic-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px;}
+.topic-preset{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;cursor:pointer;transition:all .18s;}
+.topic-preset:hover{border-color:var(--text2);background:var(--surface);}
+.topic-preset-icon{font-size:18px;margin-bottom:4px;}
+.topic-preset-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.topic-preset-desc{font-size:10px;color:var(--text3);line-height:1.4;}
+.topic-custom-row{display:flex;gap:8px;margin-bottom:12px;}
+.topic-custom-input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--r-sm);font-family:"Inter",sans-serif;font-size:13px;color:var(--text);background:var(--surface2);outline:none;}
+.topic-custom-input:focus{border-color:var(--text2);}
+.topic-days-row{display:flex;gap:6px;margin-bottom:12px;align-items:center;}
+.topic-days-lbl{font-size:11px;color:var(--text2);white-space:nowrap;}
+.day-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;}
+.day-btn.sel{background:var(--text);color:white;border-color:var(--text);}
+.topic-start-btn{width:100%;padding:10px;background:var(--text);color:white;border:none;border-radius:var(--r-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:"Inter",sans-serif;transition:background .18s;}
+.topic-start-btn:hover{background:var(--maple);}
+.topic-hist-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.topic-hist-item:last-child{border-bottom:none;}
+.topic-hist-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.topic-hist-main{flex:1;min-width:0;}
+.topic-hist-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.topic-hist-meta{font-size:10.5px;color:var(--text3);font-family:"DM Mono",monospace;}
+.topic-hist-badge{font-size:9.5px;padding:2px 7px;border-radius:10px;background:var(--green-light);color:var(--green);font-weight:600;flex-shrink:0;}
+
 /* MOBILE CHAT FAB */
 .chat-fab{display:none;position:fixed;bottom:24px;right:20px;z-index:150;width:52px;height:52px;background:var(--text);color:white;border:none;border-radius:50%;font-size:22px;cursor:pointer;box-shadow:var(--sh-lg);align-items:center;justify-content:center;transition:all .2s;}
 .chat-fab:hover{background:var(--maple);}
@@ -449,6 +495,7 @@ nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex
   <button class="tab" onclick="switchTab('wordlist',this)">All Words</button>
   <button class="tab" onclick="switchTab('history',this)">History</button>
   <button class="tab" onclick="switchTab('corrections',this)">✏️ Corrections</button>
+  <button class="tab" onclick="switchTab('topics',this)">📌 Topics</button>
 </nav>
 
 <div class="app-body">
@@ -588,6 +635,11 @@ nav{background:var(--surface);border-bottom:1px solid var(--border);display:flex
     <!-- CORRECTIONS -->
     <div class="section" id="section-corrections" style="padding:16px 20px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;">
       <div id="correctionsEl"></div>
+    </div>
+
+    <!-- TOPICS -->
+    <div class="section" id="section-topics" style="padding:16px 20px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;">
+      <div id="topicsEl"></div>
     </div>
 
   </div>
@@ -737,8 +789,10 @@ function load(){
     if(!d.goals)d.goals={newWords:5,review:10};
     if(!d.weakHits)d.weakHits={};
     if(!d.corrections)d.corrections=[];
+    if(!d.topics)d.topics=[];
+    if(!d.activeTopic)d.activeTopic=null;
     return d;
-  }catch{return{checkins:[],words:[],ratings:{},srs:{},sessions:[],goals:{newWords:5,review:10},weakHits:{},corrections:[]};}}
+  }catch{return{checkins:[],words:[],ratings:{},srs:{},sessions:[],goals:{newWords:5,review:10},weakHits:{},corrections:[],topics:[],activeTopic:null};}}
 
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db));}catch{}}
 let db=load();
@@ -810,6 +864,7 @@ function switchTab(name,btn){
   if(name==='wordlist')renderWordList();
   if(name==='history')renderHistory();
   if(name==='corrections')renderCorrections();
+  if(name==='topics')renderTopics();
 }
 
 function updateHeader(){
@@ -1531,11 +1586,205 @@ function deleteCorr(id){
 }
 
 // ═══════════════════════════════════════
+//  TOPICS
+// ═══════════════════════════════════════
+const TOPIC_PRESETS=[
+  {icon:'🍽️',name:'Ordering at a restaurant',desc:'Menus, specials, complaints, compliments',days:5},
+  {icon:'☁️',name:'Talking about weather',desc:'Small talk, forecasts, Winnipeg winters',days:3},
+  {icon:'🏒',name:'Hockey talk',desc:'Teams, games, players, trash talk',days:5},
+  {icon:'💼',name:'Workplace chat',desc:'Meetings, deadlines, coworkers, office life',days:7},
+  {icon:'🏠',name:'Housing & neighbourhoods',desc:'Renting, buying, neighbours, Winnipeg areas',days:5},
+  {icon:'🛒',name:'Shopping & errands',desc:'Stores, deals, lineups, returns',days:3},
+  {icon:'🎉',name:'Weekend plans & social life',desc:'Invites, making plans, FOMO, excuses',days:5},
+  {icon:'🚗',name:'Getting around Winnipeg',desc:'Transit, driving, road conditions, detours',days:3},
+];
+
+let selectedDays=5;
+let customTopicName='';
+
+function todayDateObj(){return new Date(todayStr());}
+
+function getTopicStatus(topic){
+  const start=new Date(topic.startDate);
+  const today=todayDateObj();
+  const daysPassed=Math.floor((today-start)/86400000);
+  const currentDay=Math.min(daysPassed+1,topic.days);
+  const isQuizDay=daysPassed===topic.days-1;
+  const isComplete=daysPassed>=topic.days;
+  return{daysPassed,currentDay,isQuizDay,isComplete};
+}
+
+function startTopic(name){
+  if(!name||!name.trim()){toast('Please enter a topic name');return;}
+  if(db.activeTopic){
+    if(!confirm('End current topic "'+db.activeTopic.name+'" and start a new one?'))return;
+    db.topics.unshift({...db.activeTopic,completedDate:todayStr(),status:'abandoned'});
+  }
+  db.activeTopic={
+    id:Date.now(),
+    name:name.trim(),
+    days:selectedDays,
+    startDate:todayStr(),
+    icon:TOPIC_PRESETS.find(p=>p.name===name)?.icon||'📌'
+  };
+  save();renderTopics();
+  toast('📌 Topic started: '+name.trim());
+}
+
+function endTopic(status='complete'){
+  if(!db.activeTopic)return;
+  db.topics.unshift({...db.activeTopic,completedDate:todayStr(),status});
+  db.activeTopic=null;
+  save();renderTopics();
+  toast(status==='complete'?'✅ Topic completed!':'Topic ended.');
+}
+
+function getChatPrompt(){
+  if(!db.activeTopic)return'';
+  const{currentDay,isQuizDay,isComplete}=getTopicStatus(db.activeTopic);
+  if(isComplete||isQuizDay){
+    // Quiz day prompt
+    const wordList=db.words.slice(-30).map(w=>w.phrase).join(', ');
+    return `Today is ${todayStr()}. We are doing the FINAL QUIZ for our topic: "${db.activeTopic.name}" (Day ${db.activeTopic.days} of ${db.activeTopic.days}).
+
+Quiz me on everything from this topic. Focus on: natural expressions, vocabulary, and real situations. Use words from my recent bank if relevant: ${wordList}
+
+Start the quiz now — 5 questions, scenario-based.`;
+  }
+  return `Today is ${todayStr()}. Our current study topic is: "${db.activeTopic.name}" — Day ${currentDay} of ${db.activeTopic.days}.
+
+Let's do today's session focused on this topic. Start by asking me something related to it.`;
+}
+
+function copyPrompt(){
+  const prompt=getChatPrompt();
+  if(!prompt){toast('No active topic');return;}
+  navigator.clipboard.writeText(prompt).then(()=>{
+    const btn=document.getElementById('topicCopyBtn');
+    if(btn){btn.textContent='✅ Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='📋 Copy opening line for Claude';btn.classList.remove('copied');},2000);}
+    toast('Copied! Paste this to start your Claude session.');
+  }).catch(()=>{
+    // Fallback for mobile
+    const ta=document.createElement('textarea');ta.value=prompt;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    toast('Copied!');
+  });
+}
+
+function copyQuizPrompt(){
+  const at=db.activeTopic;if(!at)return;
+  const wordList=db.words.slice(-30).map(w=>w.phrase).join(', ');
+  const prompt=`Today is ${todayStr()}. We're doing the FINAL QUIZ for topic: "${at.name}".
+
+Quiz me on this topic — 5 scenario-based questions covering vocabulary, expressions, and real-life situations. Use words from my bank: ${wordList}
+
+Start now.`;
+  navigator.clipboard.writeText(prompt).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=prompt;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+  });
+  toast('Quiz prompt copied! Paste to Claude.');
+}
+
+function setDays(d,btn){
+  selectedDays=d;
+  document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+function renderTopics(){
+  const el=document.getElementById('topicsEl');if(!el)return;
+  if(!db.topics)db.topics=[];
+  if(!db.activeTopic)db.activeTopic=null;
+
+  let html='';
+
+  // ── Active topic banner ──
+  if(db.activeTopic){
+    const t=db.activeTopic;
+    const{currentDay,isQuizDay,isComplete}=getTopicStatus(t);
+
+    // Quiz day alert
+    if(isQuizDay||isComplete){
+      html+=`<div class="quiz-banner">
+        <div class="quiz-banner-icon">🎯</div>
+        <div class="quiz-banner-text">
+          <div class="quiz-banner-title">${isComplete?'Topic complete — quiz overdue!':'Today is quiz day!'}</div>
+          <div class="quiz-banner-sub">Copy the prompt and paste it into your Claude session to start the final quiz.</div>
+        </div>
+        <button class="quiz-copy-btn" onclick="copyQuizPrompt()">Copy quiz prompt</button>
+      </div>`;
+    }
+
+    // Active topic card
+    const dots=Array.from({length:t.days},(_,i)=>{
+      let cls='topic-day-dot';
+      if(i<currentDay-1)cls+=' done';
+      else if(i===currentDay-1)cls+=' today';
+      return '<div class="'+cls+'"></div>';
+    }).join('');
+
+    html+=`<div class="topic-active-banner">
+      <div class="tab-label">Active Topic</div>
+      <div class="topic-name-display">${t.icon} ${t.name}</div>
+      <div class="topic-day-row">
+        <div class="topic-day-dots">${dots}</div>
+        <div class="topic-day-txt">Day ${currentDay} of ${t.days}</div>
+      </div>
+      <button class="topic-copy-btn" id="topicCopyBtn" onclick="copyPrompt()">📋 Copy opening line for Claude</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button onclick="endTopic('complete')" style="flex:1;padding:7px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif">✅ Mark complete</button>
+      <button onclick="endTopic('abandoned')" style="flex:1;padding:7px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer;font-family:'Inter',sans-serif">⏭ Skip topic</button>
+    </div>`;
+  }
+
+  // ── New topic section ──
+  html+=`<div class="topic-card">
+    <div class="topic-hdr">
+      <div class="topic-hdr-title">${db.activeTopic?'Switch Topic':'Start a Topic'}</div>
+    </div>
+    <div class="topic-grid">
+      ${TOPIC_PRESETS.map(p=>`<div class="topic-preset" onclick="document.getElementById('topicCustomInput').value='${p.name.replace(/'/g,"\'")}';customTopicName='${p.name.replace(/'/g,"\'")}';selectedDays=${p.days};document.querySelectorAll('.day-btn').forEach(b=>{b.classList.remove('sel');if(b.dataset.days=='${p.days}')b.classList.add('sel');})">
+        <div class="topic-preset-icon">${p.icon}</div>
+        <div class="topic-preset-name">${p.name}</div>
+        <div class="topic-preset-desc">${p.desc} · ${p.days}d</div>
+      </div>`).join('')}
+    </div>
+    <div class="topic-custom-row">
+      <input class="topic-custom-input" id="topicCustomInput" placeholder="Or type your own topic..." oninput="customTopicName=this.value">
+    </div>
+    <div class="topic-days-row">
+      <span class="topic-days-lbl">Duration:</span>
+      ${[3,5,7,10].map(d=>`<button class="day-btn${d===5?' sel':''}" data-days="${d}" onclick="setDays(${d},this)">${d}d</button>`).join('')}
+    </div>
+    <button class="topic-start-btn" onclick="startTopic(document.getElementById('topicCustomInput').value||customTopicName)">Start Topic →</button>
+  </div>`;
+
+  // ── Topic history ──
+  if(db.topics.length){
+    html+=`<div class="topic-card">
+      <div class="topic-hdr-title" style="margin-bottom:10px">Past Topics</div>
+      ${db.topics.map(t=>`<div class="topic-hist-item">
+        <div class="topic-hist-icon">${t.icon||'📌'}</div>
+        <div class="topic-hist-main">
+          <div class="topic-hist-name">${t.name}</div>
+          <div class="topic-hist-meta">${t.startDate} → ${t.completedDate||'?'} · ${t.days} days</div>
+        </div>
+        <div class="topic-hist-badge">${t.status==='complete'?'✅ Done':t.status==='abandoned'?'⏭ Skipped':'📌'}</div>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  el.innerHTML=html;
+}
+
+// ═══════════════════════════════════════
 //  BACKUP
 // ═══════════════════════════════════════
 function exportData(){
   if(!db.corrections)db.corrections=[];
-  const backup={version:5,exported:new Date().toISOString(),checkins:db.checkins,words:db.words,ratings:db.ratings,srs:db.srs,sessions:db.sessions,goals:db.goals,weakHits:db.weakHits,corrections:db.corrections};
+  if(!db.topics)db.topics=[];const backup={version:6,exported:new Date().toISOString(),checkins:db.checkins,words:db.words,ratings:db.ratings,srs:db.srs,sessions:db.sessions,goals:db.goals,weakHits:db.weakHits,corrections:db.corrections,topics:db.topics,activeTopic:db.activeTopic||null};
   const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`ehspeak_backup_${todayStr()}.json`;a.click();
   toast(`✅ Backup exported! (${db.words.length} words, ${db.corrections.length} corrections)`);
